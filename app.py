@@ -5,6 +5,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 import dotenv
+from werkzeug.exceptions import Unauthorized
 
 from forms import (
     UserAddForm,
@@ -13,7 +14,7 @@ from forms import (
     UserEditForm,
     CSRFProtectForm,
 )
-from models import db, connect_db, User, Message
+from models import db, connect_db, User, Message, DEFAULT_HEADER, DEFAULT_PIC
 
 dotenv.load_dotenv()
 
@@ -133,8 +134,10 @@ def logout():
 
     if form.validate_on_submit():
         do_logout()
-
-    return redirect("/")
+        flash("Successfully logged out!")
+        return redirect("/")
+    else:
+        raise Unauthorized()
 
 
 ##############################################################################
@@ -225,6 +228,9 @@ def stop_following(follow_id):
 def profile():
     """Update profile for current user."""
 
+    if not g.user:
+        raise Unauthorized("Not logged in.")
+
     user = User.query.get(session[CURR_USER_KEY])
     form = UserEditForm(obj=user)
     if form.validate_on_submit():
@@ -234,18 +240,37 @@ def profile():
 
         user.username = form.username.data
         user.email = form.email.data
-        user.image_url = form.image_url.data
-        user.header_image_url = form.header_image_url.data
+        user.image_url = (
+            form.image_url.data if form.image_url.data else DEFAULT_PIC
+        )
+        user.header_image_url = (
+            form.header_image_url.data
+            if form.header_image_url.data
+            else DEFAULT_HEADER
+        )
         user.bio = form.bio.data
         db.session.commit()
         return redirect(f"/users/{user.id}")
     else:
+        form.image_url.data = (
+            "" if form.image_url.data == DEFAULT_PIC else form.image_url.data
+        )
+        form.header_image_url.data = (
+            ""
+            if form.header_image_url.data == DEFAULT_HEADER
+            else form.header_image_url.data
+        )
         return render_template("users/edit.html", form=form)
 
 
 @app.post("/users/delete")
 def delete_user():
     """Delete user."""
+
+    form = CSRFProtectForm()
+
+    if not form.validate_on_submit():
+        raise Unauthorized()
 
     if not g.user:
         flash("Access unauthorized.", "danger")
