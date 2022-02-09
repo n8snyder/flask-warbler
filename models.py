@@ -12,17 +12,17 @@ db = SQLAlchemy()
 class Follows(db.Model):
     """Connection of a follower <-> followed_user."""
 
-    __tablename__ = 'follows'
+    __tablename__ = "follows"
 
     user_being_followed_id = db.Column(
         db.Integer,
-        db.ForeignKey('users.id', ondelete="cascade"),
+        db.ForeignKey("users.id", ondelete="cascade"),
         primary_key=True,
     )
 
     user_following_id = db.Column(
         db.Integer,
-        db.ForeignKey('users.id', ondelete="cascade"),
+        db.ForeignKey("users.id", ondelete="cascade"),
         primary_key=True,
     )
 
@@ -30,7 +30,7 @@ class Follows(db.Model):
 class User(db.Model):
     """User in the system."""
 
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     id = db.Column(
         db.Integer,
@@ -55,8 +55,7 @@ class User(db.Model):
     )
 
     header_image_url = db.Column(
-        db.Text,
-        default="/static/images/warbler-hero.jpg"
+        db.Text, default="/static/images/warbler-hero.jpg"
     )
 
     bio = db.Column(
@@ -72,20 +71,20 @@ class User(db.Model):
         nullable=False,
     )
 
-    messages = db.relationship('Message', order_by='Message.timestamp.desc()')
+    messages = db.relationship("Message", order_by="Message.timestamp.desc()")
 
     followers = db.relationship(
         "User",
         secondary="follows",
         primaryjoin=(Follows.user_being_followed_id == id),
-        secondaryjoin=(Follows.user_following_id == id)
+        secondaryjoin=(Follows.user_following_id == id),
     )
 
     following = db.relationship(
         "User",
         secondary="follows",
         primaryjoin=(Follows.user_following_id == id),
-        secondaryjoin=(Follows.user_being_followed_id == id)
+        secondaryjoin=(Follows.user_being_followed_id == id),
     )
 
     def __repr__(self):
@@ -94,13 +93,17 @@ class User(db.Model):
     def is_followed_by(self, other_user):
         """Is this user followed by `other_user`?"""
 
-        found_user_list = [user for user in self.followers if user == other_user]
+        found_user_list = [
+            user for user in self.followers if user == other_user
+        ]
         return len(found_user_list) == 1
 
     def is_following(self, other_user):
         """Is this user following `other_use`?"""
 
-        found_user_list = [user for user in self.following if user == other_user]
+        found_user_list = [
+            user for user in self.following if user == other_user
+        ]
         return len(found_user_list) == 1
 
     @classmethod
@@ -110,7 +113,7 @@ class User(db.Model):
         Hashes password and adds user to system.
         """
 
-        hashed_pwd = bcrypt.generate_password_hash(password).decode('UTF-8')
+        hashed_pwd = bcrypt.generate_password_hash(password).decode("UTF-8")
 
         user = User(
             username=username,
@@ -146,7 +149,7 @@ class User(db.Model):
 class Message(db.Model):
     """An individual message ("warble")."""
 
-    __tablename__ = 'messages'
+    __tablename__ = "messages"
 
     id = db.Column(
         db.Integer,
@@ -166,11 +169,11 @@ class Message(db.Model):
 
     user_id = db.Column(
         db.Integer,
-        db.ForeignKey('users.id', ondelete='CASCADE'),
+        db.ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
     )
 
-    user = db.relationship('User')
+    user = db.relationship("User")
 
 
 def connect_db(app):
