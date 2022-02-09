@@ -4,6 +4,7 @@ from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
+import dotenv
 
 from forms import (
     UserAddForm,
@@ -13,6 +14,8 @@ from forms import (
     CSRFProtectForm,
 )
 from models import db, connect_db, User, Message
+
+dotenv.load_dotenv()
 
 CURR_USER_KEY = "curr_user"
 
