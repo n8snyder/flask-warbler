@@ -23,14 +23,14 @@
         <form method="POST" action="/messages/unlike/{{ message.id }}">
           {{ g.csrf_form.hidden_tag() }}
           <button class="like-button">
-            <i class="fas fa-star" id="like-{{ message.id }}"></i>
+            <i class="fas fa-star"></i>
           </button>
         </form>
         {% else %}
         <form method="POST" action="/messages/like/{{ message.id }}">
           {{ g.csrf_form.hidden_tag() }}
           <button class="like-button">
-            <i class="far fa-star" id="like-{{ message.id }}"></i>
+            <i class="far fa-star"></i>
           </button>
         </form>
         {% endif %}
