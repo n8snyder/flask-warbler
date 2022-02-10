@@ -210,8 +210,7 @@ def show_likes(user_id):
         return redirect("/")
 
     user = User.query.get_or_404(user_id)
-    messages = Message.query.join(Like).filter(Like.user_id == user_id).all()
-    return render_template("users/likes.html", user=user, messages=messages)
+    return render_template("users/likes.html", user=user)
 
 
 @app.post("/users/follow/<int:follow_id>")
@@ -335,7 +334,7 @@ def messages_add():
 def messages_show(message_id):
     """Show a message."""
 
-    msg = Message.query.get(message_id)
+    msg = Message.query.get_or_404(message_id)
     return render_template("messages/show.html", message=msg)
 
 
@@ -372,8 +371,8 @@ def like_message(message_id):
         flash("You can't like your own warbles!")
         return redirect(request.referrer)
 
-    like = Like(user_id=g.user.id, message_id=message.id)
-    db.session.add(like)
+    g.user.likes.append(message)
+
     db.session.commit()
     return redirect(request.referrer)
 

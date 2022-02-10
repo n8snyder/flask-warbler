@@ -30,6 +30,24 @@ class Follows(db.Model):
     )
 
 
+class Like(db.Model):
+    """Like for messages."""
+
+    __tablename__ = "likes"
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+
+    message_id = db.Column(
+        db.Integer,
+        db.ForeignKey("messages.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+
+
 class User(db.Model):
     """User in the system."""
 
@@ -88,12 +106,12 @@ class User(db.Model):
         secondaryjoin=(Follows.user_being_followed_id == id),
     )
 
-    # likes = db.relationship(
-    #     "Messages",
-    #     secondary="likes",
-    #     primaryjoin="Like.user_id == id",
-    #     secondaryjoin="Like.message_id == Message.id",
-    # )
+    likes = db.relationship(
+        "Message",
+        secondary="likes",
+        backref="liked_by",
+        order_by="desc(Message.timestamp)",
+    )
 
     def __repr__(self):
         return f"<User #{self.id}: {self.username}, {self.email}>"
@@ -183,6 +201,14 @@ class Message(db.Model):
 
     user = db.relationship("User")
 
+    # liked_by = db.relationship(
+    #     "User",
+    #     back_populates="likes",
+    #     secondary="likes",
+    #     primaryjoin="Like.message_id == id",
+    #     secondaryjoin="Like.user_id == User.id",
+    # )
+
     def is_liked(this, user):
         """Returns True if the message is liked by the user"""
 
@@ -191,24 +217,6 @@ class Message(db.Model):
                 Like.message_id == this.id, Like.user_id == user.id
             ).one_or_none()
         )
-
-
-class Like(db.Model):
-    """Like for messages."""
-
-    __tablename__ = "likes"
-
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey("users.id", ondelete="CASCADE"),
-        primary_key=True,
-    )
-
-    message_id = db.Column(
-        db.Integer,
-        db.ForeignKey("messages.id", ondelete="CASCADE"),
-        primary_key=True,
-    )
 
 
 def connect_db(app):
