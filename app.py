@@ -170,11 +170,10 @@ def list_users():
 
 
 @app.get("/users/<int:user_id>")
-def users_show(user_id):
+def show_user(user_id):
     """Show user profile."""
 
     user = User.query.get_or_404(user_id)
-
     return render_template("users/show.html", user=user)
 
 
@@ -191,7 +190,7 @@ def show_following(user_id):
 
 
 @app.get("/users/<int:user_id>/followers")
-def users_followers(user_id):
+def show_followers(user_id):
     """Show list of followers of this user."""
 
     if not g.user:
@@ -200,6 +199,19 @@ def users_followers(user_id):
 
     user = User.query.get_or_404(user_id)
     return render_template("users/followers.html", user=user)
+
+
+@app.get("/users/<int:user_id>/likes")
+def show_likes(user_id):
+    """Show list of messages that are liked by this user."""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    user = User.query.get_or_404(user_id)
+    messages = Message.query.join(Like).filter(Like.user_id == user_id).all()
+    return render_template("users/likes.html", user=user, messages=messages)
 
 
 @app.post("/users/follow/<int:follow_id>")
