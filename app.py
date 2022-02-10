@@ -358,7 +358,7 @@ def like_message(message_id):
     like = Like(user_id=g.user.id, message_id=message.id)
     db.session.add(like)
     db.session.commit()
-    return redirect("/")
+    return redirect(request.referrer)
 
 
 @app.post("/messages/unlike/<int:message_id>")
@@ -377,7 +377,7 @@ def unlike_message(message_id):
         Like.user_id == g.user.id, Like.message_id == message_id
     ).delete()
     db.session.commit()
-    return redirect("/")
+    return redirect(request.referrer)
 
 
 ##############################################################################

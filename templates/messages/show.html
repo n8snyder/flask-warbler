@@ -21,17 +21,6 @@
             </form>
             {% endif %}
             {% if g.user.id != message.user.id %}
-            {% if message.is_liked(g.user) %}
-            <form method="POST" action="/messages/unlike/{{ message.id }}">
-              {{ g.csrf_form.hidden_tag() }}
-              <button class="btn btn-primary">Unlike</button>
-            </form>
-            {% else %}
-            <form method="POST" action="/messages/like/{{ message.id }}">
-              {{ g.csrf_form.hidden_tag() }}
-              <button class="btn btn-primary">Like</button>
-            </form>
-            {% endif %}
             {% if g.user.is_following(message.user) %}
             <form method="POST" action="/users/stop-following/{{ message.user.id }}">
               {{ g.csrf_form.hidden_tag() }}
@@ -48,6 +37,25 @@
           </div>
           <p class="single-message">{{ message.text }}</p>
           <span class="text-muted">{{ message.timestamp.strftime('%d %B %Y') }}</span>
+        </div>
+        <div class="messages-like-bottom">
+          {% if not g.user.id == message.user_id %}
+          {% if message.is_liked(g.user) %}
+          <form method="POST" action="/messages/unlike/{{ message.id }}">
+            {{ g.csrf_form.hidden_tag() }}
+            <button class="like-button">
+              <i class="fas fa-star" id="like-{{ message.id }}"></i>
+            </button>
+          </form>
+          {% else %}
+          <form method="POST" action="/messages/like/{{ message.id }}">
+            {{ g.csrf_form.hidden_tag() }}
+            <button class="like-button">
+              <i class="far fa-star" id="like-{{ message.id }}"></i>
+            </button>
+          </form>
+          {% endif %}
+          {% endif %}
         </div>
       </li>
     </ul>
