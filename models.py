@@ -106,6 +106,7 @@ class User(db.Model):
         secondaryjoin=(Follows.user_being_followed_id == id),
     )
 
+    # TODO: Rename likes to something to do with messages
     likes = db.relationship(
         "Message",
         secondary="likes",
@@ -200,14 +201,6 @@ class Message(db.Model):
     )
 
     user = db.relationship("User")
-
-    # liked_by = db.relationship(
-    #     "User",
-    #     back_populates="likes",
-    #     secondary="likes",
-    #     primaryjoin="Like.message_id == id",
-    #     secondaryjoin="Like.user_id == User.id",
-    # )
 
     def is_liked(this, user):
         """Returns True if the message is liked by the user"""

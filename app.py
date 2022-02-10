@@ -139,13 +139,12 @@ def logout():
     """Handle logout of user."""
 
     form = CSRFProtectForm()
-
-    if form.validate_on_submit():
-        do_logout()
-        flash("Successfully logged out!")
-        return redirect("/")
-    else:
+    if not form.validate_on_submit():
         raise Unauthorized()
+
+    do_logout()
+    flash("Successfully logged out!")
+    return redirect("/")
 
 
 ##############################################################################
@@ -217,6 +216,10 @@ def show_likes(user_id):
 def add_follow(follow_id):
     """Add a follow for the currently-logged-in user."""
 
+    form = CSRFProtectForm()
+    if not form.validate_on_submit():
+        raise Unauthorized()
+
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
@@ -231,6 +234,10 @@ def add_follow(follow_id):
 @app.post("/users/stop-following/<int:follow_id>")
 def stop_following(follow_id):
     """Have currently-logged-in-user stop following this user."""
+
+    form = CSRFProtectForm()
+    if not form.validate_on_submit():
+        raise Unauthorized()
 
     if not g.user:
         flash("Access unauthorized.", "danger")
@@ -287,7 +294,6 @@ def delete_user():
     """Delete user."""
 
     form = CSRFProtectForm()
-
     if not form.validate_on_submit():
         raise Unauthorized()
 
@@ -342,6 +348,10 @@ def messages_show(message_id):
 def messages_destroy(message_id):
     """Delete a message."""
 
+    form = CSRFProtectForm()
+    if not form.validate_on_submit():
+        raise Unauthorized()
+
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
@@ -370,16 +380,18 @@ def like_message(message_id):
     if message.user_id == g.user.id:
         flash("You can't like your own warbles!")
         return redirect(request.referrer)
+        # TODO: Use a callback instead of request.referrer
 
     g.user.likes.append(message)
 
     db.session.commit()
     return redirect(request.referrer)
+    # TODO: Use a callback instead of request.referrer
 
 
 @app.post("/messages/unlike/<int:message_id>")
 def unlike_message(message_id):
-    """Like a message"""
+    """Unlike a message"""
 
     form = CSRFProtectForm()
     if not form.validate_on_submit():
@@ -394,6 +406,7 @@ def unlike_message(message_id):
     ).delete()
     db.session.commit()
     return redirect(request.referrer)
+    # TODO: Use a callback instead of request.referrer
 
 
 ##############################################################################

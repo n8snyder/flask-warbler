@@ -1,0 +1,19 @@
+<div class="messages-like">
+  {% if not g.user.id == message.user_id %}
+  {% if message.is_liked(g.user) %}
+  <form method="POST" action="/messages/unlike/{{ message.id }}">
+    {{ g.csrf_form.hidden_tag() }}
+    <button class="like-button">
+      <i class="fas fa-star"></i>
+    </button>
+  </form>
+  {% else %}
+  <form method="POST" action="/messages/like/{{ message.id }}">
+    {{ g.csrf_form.hidden_tag() }}
+    <button class="like-button">
+      <i class="far fa-star"></i>
+    </button>
+  </form>
+  {% endif %}
+  {% endif %}
+</div>
