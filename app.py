@@ -14,7 +14,15 @@ from forms import (
     UserEditForm,
     CSRFProtectForm,
 )
-from models import db, connect_db, User, Message, DEFAULT_HEADER, DEFAULT_PIC
+from models import (
+    db,
+    connect_db,
+    User,
+    Message,
+    Like,
+    DEFAULT_HEADER,
+    DEFAULT_PIC,
+)
 
 dotenv.load_dotenv()
 
@@ -332,6 +340,44 @@ def messages_destroy(message_id):
     db.session.commit()
 
     return redirect(f"/users/{g.user.id}")
+
+
+@app.post("/messages/like/<int:message_id>")
+def like_message(message_id):
+    """Like a message"""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    form = CSRFProtectForm()
+    if not form.validate_on_submit():
+        raise Unauthorized()
+
+    message = Message.query.get_or_404(message_id)
+    like = Like(user_id=g.user.id, message_id=message.id)
+    db.session.add(like)
+    db.session.commit()
+    return redirect("/")
+
+
+@app.post("/messages/unlike/<int:message_id>")
+def unlike_message(message_id):
+    """Like a message"""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    form = CSRFProtectForm()
+    if not form.validate_on_submit():
+        raise Unauthorized()
+
+    Like.query.filter(
+        Like.user_id == g.user.id, Like.message_id == message_id
+    ).delete()
+    db.session.commit()
+    return redirect("/")
 
 
 ##############################################################################
