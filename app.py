@@ -346,15 +346,20 @@ def messages_destroy(message_id):
 def like_message(message_id):
     """Like a message"""
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
-
     form = CSRFProtectForm()
     if not form.validate_on_submit():
         raise Unauthorized()
 
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
     message = Message.query.get_or_404(message_id)
+
+    if message.user_id == g.user.id:
+        flash("You can't like your own warbles!")
+        return redirect(request.referrer)
+
     like = Like(user_id=g.user.id, message_id=message.id)
     db.session.add(like)
     db.session.commit()
@@ -365,13 +370,13 @@ def like_message(message_id):
 def unlike_message(message_id):
     """Like a message"""
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
-
     form = CSRFProtectForm()
     if not form.validate_on_submit():
         raise Unauthorized()
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
 
     Like.query.filter(
         Like.user_id == g.user.id, Like.message_id == message_id
