@@ -106,8 +106,7 @@ class User(db.Model):
         secondaryjoin=(Follows.user_being_followed_id == id),
     )
 
-    # TODO: Rename likes to something to do with messages
-    likes = db.relationship(
+    liked_messages = db.relationship(
         "Message",
         secondary="likes",
         backref="liked_by",
