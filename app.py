@@ -63,7 +63,7 @@ def add_user_to_g():
 def add_form_to_g():
     """Include CSRFProtectForm in Flask global."""
 
-    g.csrf_form = CSRFProtectForm()
+    g.csrf_form = CSRFProtectForm(callback=request.path)
 
 
 def do_login(user):
@@ -379,14 +379,11 @@ def like_message(message_id):
 
     if message.user_id == g.user.id:
         flash("You can't like your own warbles!")
-        return redirect(request.referrer)
-        # TODO: Use a callback instead of request.referrer
+        return redirect(form.callback.data)
 
-    g.user.likes.append(message)
-
+    g.user.liked_messages.append(message)
     db.session.commit()
-    return redirect(request.referrer)
-    # TODO: Use a callback instead of request.referrer
+    return redirect(form.callback.data)
 
 
 @app.post("/messages/unlike/<int:message_id>")
@@ -405,8 +402,7 @@ def unlike_message(message_id):
         Like.user_id == g.user.id, Like.message_id == message_id
     ).delete()
     db.session.commit()
-    return redirect(request.referrer)
-    # TODO: Use a callback instead of request.referrer
+    return redirect(form.callback.data)
 
 
 ##############################################################################
