@@ -21,7 +21,7 @@ from models import (
     Message,
     Like,
     DEFAULT_HEADER,
-    DEFAULT_PIC,
+    DEFAULT_IMAGE,
 )
 
 dotenv.load_dotenv()
@@ -61,7 +61,12 @@ def add_user_to_g():
 
 @app.before_request
 def add_form_to_g():
-    """Include CSRFProtectForm in Flask global."""
+    """Include CSRFProtectForm in Flask global.
+
+    The form will have a hidden field of callback which is the path for this
+    request. This allows for the form submition route to potentially redirect
+    to where the form was submitted from.
+    """
 
     g.csrf_form = CSRFProtectForm(callback=request.path)
 
@@ -267,7 +272,7 @@ def profile():
         user.username = form.username.data
         user.email = form.email.data
         user.image_url = (
-            form.image_url.data if form.image_url.data else DEFAULT_PIC
+            form.image_url.data if form.image_url.data else DEFAULT_IMAGE
         )
         user.header_image_url = (
             form.header_image_url.data
@@ -279,7 +284,7 @@ def profile():
         return redirect(f"/users/{user.id}")
     else:
         form.image_url.data = (
-            "" if form.image_url.data == DEFAULT_PIC else form.image_url.data
+            "" if form.image_url.data == DEFAULT_IMAGE else form.image_url.data
         )
         form.header_image_url.data = (
             ""
@@ -356,7 +361,11 @@ def messages_destroy(message_id):
         flash("Access unauthorized.", "danger")
         return redirect("/")
 
-    msg = Message.query.get(message_id)
+    msg = Message.query.get_or_404(message_id)
+
+    if msg.user_id != g.user.id:
+        raise Unauthorized()
+
     db.session.delete(msg)
     db.session.commit()
 

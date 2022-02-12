@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<!-- Show Message Page -->
 
 <div class="bg"></div>
 <div class="row justify-content-center">
@@ -40,7 +41,7 @@
         </div>
         <div class="messages-like-bottom">
           {% if not g.user.id == message.user_id %}
-          {% if message.is_liked(g.user) %}
+          {% if g.user and message.is_liked_by(g.user) %}
           <form method="POST" action="/messages/unlike/{{ message.id }}">
             {{ g.csrf_form.hidden_tag() }}
             <button class="like-button">

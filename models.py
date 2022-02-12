@@ -8,7 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 bcrypt = Bcrypt()
 db = SQLAlchemy()
 
-DEFAULT_PIC = "/static/images/default-pic.png"
+DEFAULT_IMAGE = "/static/images/default-pic.png"
 DEFAULT_HEADER = "/static/images/warbler-hero.jpg"
 
 
@@ -72,10 +72,13 @@ class User(db.Model):
 
     image_url = db.Column(
         db.Text,
-        server_default=DEFAULT_PIC,
+        server_default=DEFAULT_IMAGE,
     )
 
-    header_image_url = db.Column(db.Text, server_default=DEFAULT_HEADER)
+    header_image_url = db.Column(
+        db.Text,
+        server_default=DEFAULT_HEADER,
+    )
 
     bio = db.Column(
         db.Text,
@@ -201,7 +204,7 @@ class Message(db.Model):
 
     user = db.relationship("User")
 
-    def is_liked(this, user):
+    def is_liked_by(this, user):
         """Returns True if the message is liked by the user"""
 
         return bool(
