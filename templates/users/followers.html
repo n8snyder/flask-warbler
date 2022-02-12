@@ -33,8 +33,9 @@
             {% endif %}
 
           </div>
-
+          {% if follower.bio is not none %}
           <p class="card-bio">{{ follower.bio }}</p>
+          {% endif %}
         </div>
       </div>
     </div>
