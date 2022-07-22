@@ -9,6 +9,16 @@
     <h1>What's Happening?</h1>
     <h4>New to Warbler?</h4>
     <p>Sign up now to get your own personalized timeline!</p>
-    <a href="/signup" class="btn btn-primary">Sign up</a>
+    <a href="/login" class="btn btn-primary">Sign up</a>
+    <p>
+      <form action="/login" method="POST" id="user_form">
+        {{ form.hidden_tag() }}
+        {% for field in form %}
+          {{ field(type='hidden') }}
+        {% endfor %}
+
+        <button class="btn btn-success btn-lg">Log in as demo</button>
+      </form>
+    </p>
   </div>
 {% endblock %}

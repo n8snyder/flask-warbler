@@ -104,7 +104,9 @@ def signup():
                 username=form.username.data,
                 password=form.password.data,
                 email=form.email.data,
-                image_url=form.image_url.data if form.image_url.data else None,
+                image_url=form.image_url.data
+                if form.image_url.data
+                else None,
             )
             db.session.commit()
 
@@ -284,7 +286,9 @@ def profile():
         return redirect(f"/users/{user.id}")
     else:
         form.image_url.data = (
-            "" if form.image_url.data == DEFAULT_IMAGE else form.image_url.data
+            ""
+            if form.image_url.data == DEFAULT_IMAGE
+            else form.image_url.data
         )
         form.header_image_url.data = (
             ""
@@ -427,10 +431,6 @@ def homepage():
     """
 
     if g.user:
-        # messages = (
-        #     Message.query.order_by(Message.timestamp.desc()).limit(100).all()
-        # )
-
         messages = (
             Message.query.filter(
                 or_(
@@ -448,7 +448,10 @@ def homepage():
         return render_template("home.html", messages=messages)
 
     else:
-        return render_template("home-anon.html")
+        form = LoginForm()
+        form.username.data = "demo"
+        form.password.data = "123123"
+        return render_template("home-anon.html", form=form)
 
 
 ##############################################################################

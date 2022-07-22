@@ -22,8 +22,8 @@ db.session.commit()
 
 
 user = User(
-    username="test",
-    email="test@fd.ew",
+    username="demo",
+    email="demo@demo.com",
     password="$2b$12$z6FbBI3B5hIlMG7Y2/k.5erXCUXWg4FEhis/D7LmaDINlPSgItudq",
 )
 
